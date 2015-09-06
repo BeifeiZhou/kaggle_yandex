@@ -141,7 +141,8 @@ def compress_json_file(input_file, output_file):
     with open(input_file) as reader, open(output_file, 'w') as writer:
         for line in reader:
             enumerator += 1
-            print enumerator
+            if (enumerator%10**4 == 0):
+                print enumerator
             compressed = compress_json(line)
             decompressed = session(compressed)
             writer.write(compressed)
@@ -155,5 +156,5 @@ def main():
 
 if __name__ == "__main__":
     compress_json_file(
-        input_file='/home/stepan/kaggle_yandex/data/json_examples',
-        output_file="/home/stepan/kaggle_yandex/data/struct_examples")
+        input_file= '../../my_data/train',
+        output_file= '../../my_data/train_bin')

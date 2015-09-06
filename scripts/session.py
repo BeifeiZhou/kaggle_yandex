@@ -6,12 +6,12 @@ INT_LENGTH = 4
 class serp:
     def __init__(self):
         self.type_of_record = 'Q'
-        self.serp_id = 0
-        self.query_id = 0
-        self.time_passed = 0
+        self.serp_id = -1
+        self.query_id = -1
+        self.time_passed = -1
         self.list_of_terms = []
-        self.list_of_urls_and_domains = []
-
+        self.list_of_urls_and_domains = [] # url, domain, delta_time, rank, click_type
+        self.last_clicked_rank = -1
 
 class session:
     def __init__(self, line=None):
@@ -42,9 +42,11 @@ class session:
 
                 num_urls = struct.unpack('i', line[position: position + INT_LENGTH])[0]
                 position += INT_LENGTH
+                self.serps[-1].last_clicked_rank = struct.unpack('i', line[position: position + INT_LENGTH])[0]
+                position += INT_LENGTH
                 for url_index in range(num_urls):
                     self.serps[-1].list_of_urls_and_domains.append(
-                        struct.unpack('iiii', line[position:position + 4 * INT_LENGTH]))
-                    position += 4 * INT_LENGTH
+                        struct.unpack('iiiii', line[position:position + 5 * INT_LENGTH]))
+                    position += 5 * INT_LENGTH
 
                 pass

@@ -109,6 +109,45 @@ class Data_utils(object):
 def pack(int_str):
     return bytes(struct.pack('i', int(int_str)))
 
+def process_urls(urls):
+    vec = []
+    for item in urls.items():
+        url = item[0]
+        domain = item[1]['domain']
+        time_passed = item[1]['time_passed']
+        if time_passed == {}:
+            time_passed = 100000
+        rank = item[1]['rank']
+        vec.append([url, domain, time_passed, rank])
+    vec.sort(key=lambda x: x[2])
+    max_rank = -1
+    last_clicked_rank = -1
+    for i in range(len(vec)):
+        if vec[i][2] == 100000:
+            vec[i][2] = -1
+        elif i + 1 < len(vec):
+            if vec[i][-1] > max_rank: max_rank = vec[i][-1]
+            if vec[i + 1][2] == 100000:
+                vec[i][2] = 100000
+                last_clicked_rank = vec[i][-1]
+            else: vec[i][2] = vec[i + 1][2] - vec[i][2]
+        else:
+            if vec[i][-1] > max_rank: max_rank = vec[i][-1]
+            vec[i][2] = 100000
+    vec.sort(key=lambda x: x[-1])
+    for i in range(len(vec)):
+        if vec[i][2] < 0:
+            if vec[i][-1] < max_rank:
+                vec[i].append(-2) # 'skipped'
+            else: vec[i].append(-1) # missed
+        elif vec[i][2] < 50:
+            vec[i].append(0) # low click
+        elif vec[i][2] < 300:
+            vec[i].append(1) # medium click
+        else:
+            vec[i].append(2) # deep click
+    return last_clicked_rank, vec
+
 def compress_json(line):
     parsed = json.loads(line.strip())
     compressed = b''
@@ -126,14 +165,10 @@ def compress_json(line):
         compressed += bytes(''.join([pack(x) for x in list_of_terms]))
         urls = serp['listOfUrlsAndDomains']
         compressed += pack(len(urls))
-        for item in urls.items():
-            compressed += pack(item[0])
-            compressed += pack(item[1]['domain'])
-            if not item[1]['time_passed'] == {}:
-                compressed += pack(item[1]['time_passed'])
-            else:
-                compressed += pack(-1)
-            compressed += pack(item[1]['rank'])
+        last_clicked_rank, processed_urls = process_urls(urls)
+        compressed += pack(last_clicked_rank)
+        for item in processed_urls:
+            compressed += bytes(''.join([pack(x) for x in item]))
     return compressed
 
 def compress_json_file(input_file, output_file):

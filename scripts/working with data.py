@@ -1,6 +1,7 @@
 import sys
 import json
 import struct
+from session import session
 
 class Working_with_data(object):
 
@@ -105,9 +106,54 @@ class Data_utils(object):
             for key in res.keys():
                 user_session.write(key + '\t' + ','.join(str(i) for i in res[key]) + '\n')
 
+def pack(int_str):
+    return bytes(struct.pack('i', int(int_str)))
+
+def compress_json(line):
+    parsed = json.loads(line.strip())
+    compressed = b''
+    compressed += pack(parsed['userId'])
+    compressed += pack(parsed['day'])
+    compressed += pack(len(parsed) - 2)
+    for i in range(len(parsed) - 2):
+        serp = parsed[str(i)]
+        compressed += bytes(serp['typeOfRecord'])
+        compressed += pack(serp['serpId'])
+        compressed += pack(serp['QueryId'])
+        compressed += pack(serp['time_passed'])
+        list_of_terms = serp['listOfTerms']
+        compressed += pack(len(list_of_terms))
+        compressed += bytes(''.join([pack(x) for x in list_of_terms]))
+        urls = serp['listOfUrlsAndDomains']
+        compressed += pack(len(urls))
+        for item in urls.items():
+            compressed += pack(item[0])
+            compressed += pack(item[1]['domain'])
+            if not item[1]['time_passed'] == {}:
+                compressed += pack(item[1]['time_passed'])
+            else:
+                compressed += pack(-1)
+            compressed += pack(item[1]['rank'])
+    return compressed
+
+def compress_json_file(input_file, output_file):
+    enumerator = 0
+    with open(input_file) as reader, open(output_file, 'w') as writer:
+        for line in reader:
+            enumerator += 1
+            print enumerator
+            compressed = compress_json(line)
+            decompressed = session(compressed)
+            writer.write(compressed)
+            writer.write('\n')
+            pass
 
 def main():
     #data = Working_with_data(sys.argv[1])
     people = Data_utils()
     people.Get_session_by_one_predicate(sys.argv[1], sys.argv[2], 'userId')
-main()
+
+if __name__ == "__main__":
+    compress_json_file(
+        input_file='/home/stepan/kaggle_yandex/data/json_examples',
+        output_file="/home/stepan/kaggle_yandex/data/struct_examples")

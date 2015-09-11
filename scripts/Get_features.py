@@ -1,5 +1,7 @@
 __author__ = 'annasepliaraskaia'
 import sys
+import math
+from W2V import *
 #from linear_regression_and_hash_features import HashFeatures
 
 class url(object):
@@ -145,11 +147,26 @@ class Working_with_data(object):
 
             f = HashFeatures(features, feature_names, 2**30)
             f.sort()
-            file.write(str(one_serp.session_id)+ "," + str(url) + "\t".join(str(i) for i in f) + "\t" + str(url_info.type) +"\n")
+            file.write(str(one_serp.session_id)+ "," + str(url) + "\t".join(str(i) for i in f) + "\t" + str(url_info.type)
+                       +"\n")
+
+    def Write_features_for_W2V_format(self, one_serp, file):
+        features_name = ["userId", "sessionId", "queryId", "day", "url", "urlType", "urlRang"]
+        for url in one_serp.listOfUrlsAndDomains.keys():
+            features = []
+            url_info = one_serp.listOfUrlsAndDomains[url]
+            features.append(one_serp.people_id)
+            features.append(one_serp.session_id)
+            features.append(one_serp.QueryId)
+            features.append(one_serp.day)
+            features.append(url)
+            features.append(url_info.type)
+            features.append(url_info.rank)
+            file.write("\t".join(str(f) for f in features) + "\n")
 
     def Get_data(self,data_file):
         #assume that first M,then Q,then C
-
+        n_users = 0
         clicks = {}
         serps = {}
 
@@ -157,14 +174,18 @@ class Working_with_data(object):
             for i,line in enumerate(data):
                 if (i%10**6 == 0):
                     print(i)
+                if (n_users > 10**5):
+                    break
                 line = line.strip().split('\t')
                 session_id = line[0]
                 if (len(line) == 4):
                     if (len(clicks.keys()) > 0):
+                        n_users += 1
                         for serp_id in serps.keys():
                             one_serp = serps[serp_id]
-                            #if (serp_id in clicks and len(clicks[serp_id]) > 0):
-                            #    self.Get_truth_for_one_serp(one_serp, clicks[serp_id])
+                            if (serp_id in clicks and len(clicks[serp_id]) > 0):
+                                self.Get_truth_for_one_serp(one_serp, clicks[serp_id])
+                                self.Write_features_for_W2V_format(one_serp, self.train_data)
                             #    if (one_serp.day > 24):
                             #        self.Get_basic_features(one_serp, self.test_data)
                             #    else:
@@ -191,8 +212,144 @@ class Working_with_data(object):
 
 
     def __init__(self,data_file,test_data_file, train_data_file):
-        self.test_data = open(test_data_file,'w')
+        #self.test_data = open(test_data_file,'w')
         self.train_data = open(train_data_file, 'w')
         self.Get_data(data_file)
 
-#data = Working_with_data("../../data/test", "../../data/real_test", "../../data/real_test1")
+def Get_users_for_queries(data_file):
+    queries = {}
+    with open(data_file) as data:
+        for line_n, line in enumerate(data):
+            if (line_n%10**6 == 0):
+                print(line_n)
+            line = line.strip().split("\t")
+            if (line_n%10 == 0 and int(line[3]) < 24):
+                if (line[2] not in queries):
+                    queries[line[2]] = Get_random_vector(100)
+                queries[line[2]].append(line[0])
+    #with open(res_file, 'w') as res:
+    #    for q in queries.keys():
+    #        res.write(q + "\t" + "\t".join(str(u) for u in queries[q]) + "\n")
+    return queries
+
+def Get_user_features(data_file, res):
+    dim = 100
+    n_train_days = 24
+    queries = Get_users_for_queries(data_file)
+    users = {}
+    users_urls = {}
+    res_open = open(res, 'w')
+    with open(data_file) as data:
+        for line_n,line in enumerate(data):
+            if (line_n%10**6 == 0):
+                print(line_n)
+            #for training set
+            line = line.strip().split('\t')
+            session_day = int(line[3])
+            if (session_day < n_train_days):
+                if line[0] not in users_urls:
+                    users_urls[line[0]] = {}
+                if line[4] not in users_urls[line[0]]:
+                    users_urls[line[0]][line[4]] = [0 for i in range(5)]
+                users_urls[line[0]][line[4]][int(line[5]) + 2] += 1
+            if (line_n%10 == 0):
+                if session_day < n_train_days:
+                    if line[0] not in users:
+                        users[line[0]] = [0 for i in range(dim)]
+                    if (len(queries[line[2]]) > 100):
+                        for i in range(dim):
+                            users[line[0]][i] += (1./(n_train_days - session_day)) * queries[line[2]][i]
+
+    with open(data_file) as data:
+         ex = []
+         truth = []
+         basic_ndcg = 0
+         basic_ex = []
+         ndcg = 0
+         n_ex = 0
+         for line_n,line in enumerate(data):
+             if (line_n%10 == 0):
+                 if (len(ex) > 0):
+                     person_ndcg = Get_ndcg_for_one_ex(ex, truth)
+                     ndcg += Get_ndcg_for_one_ex(ex, truth)
+                     ex_ = [[ex[i],truth[i]] for i in range(len(ex))]
+                     ex_.sort(key=lambda x:(-x[0][-1]))
+
+
+                     n_ex += 1
+                     truth.sort(key = lambda x:-x)
+                     print(truth)
+                     basic_ndcg_one = DCG(basic_ex) / (DCG([[t, t] for t in truth]) + 1e-10)
+                     basic_ndcg += DCG(basic_ex) / (DCG([[t, t] for t in truth]) + 1e-10)
+                     if (person_ndcg != basic_ndcg_one):
+                          res_open.write("\t".join(str(t[1]) for t in ex_) + "\t" +str(person_ndcg) + "\n")
+                          res_open.write("\t".join(str(i[1]) for i in basic_ex) + "\t" + str(basic_ndcg_one) + "\n\n")
+
+                 ex = []
+                 basic_ex = []
+                 truth = []
+         # for test set
+             line = line.strip().split('\t')
+             if (line_n%10**6 == 0):
+                 print(line_n)
+             session_day = int(line[3])
+             if (session_day >= n_train_days):
+                 url = line[4]
+                 user = line[0]
+                 #print("user = ", user)
+                 if line[2] in queries and user in users:
+                     people = queries[line[2]][100:]
+                     res_types = [0 for i in range(5)]
+                     n_people = 0
+                     for p in people:
+
+                         d = Scalar_vectors(users[p],users[user])
+                         d /= math.sqrt(Scalar_vectors(users[p], users[p]))
+                         d /= math.sqrt(Scalar_vectors(users[user], users[user]))
+                         for i in range(5):
+                             if url in users_urls[p]:
+                                 res_types[i] += users_urls[p][url][i]*d
+                                 n_people += users_urls[p][url][i]*d
+                     #res_open.write(user + "\t" + line[1] + "\t" + "\t".join(str(res_types[i]/(n_people+1e-10))
+                     #                                                        for i in range(5)) + "\t" + line[5] + "\t" + line[6] + "\n")
+                     ex.append(res_types)
+                     tr = int(line[5])
+                     if (tr <= 0):
+                         tr = 0
+                     truth.append(tr)
+                     basic_ex.append([10-line_n%10,  tr])
+         print (ndcg / n_ex)
+         print (basic_ndcg / n_ex)
+
+
+def Ex_score(ex):
+    sum = 0
+    positive = 0
+    for i,e in enumerate(ex):
+        sum += e*(i+1)
+    return ex[-1]
+
+def DCG(ex):
+    res = 0
+    for i in range(len(ex)):
+        res += (2**ex[i][1] - 1)/math.log(i+2,2)
+    return res
+
+def Get_ndcg_for_one_ex(ex, truth):
+    a = []
+    b = []
+    for i,e in enumerate(ex):
+        a.append([Ex_score(ex[i]) + (10-i)/10., truth[i]])
+        b.append([truth[i], truth[i]])
+    a.sort(key = lambda x:-x[0])
+    b.sort(key = lambda x:-x[0])
+    if (DCG(a) > DCG(b)):
+        print(DCG(a), DCG(b))
+    return DCG(a) / (DCG(b)+1e-10)
+
+
+
+
+
+#data = Working_with_data("../../data/train", "../../data/testW2V", "../../data/trainW2V")
+Get_user_features("../../data/trainW2V", "../../data/users_for_queriesW2V")

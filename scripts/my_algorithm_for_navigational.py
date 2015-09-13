@@ -163,10 +163,10 @@ def Get_result(data_file, users_vector, query_features, users_neighbours):
                     user_clicks.sort(key = lambda x: x[2])
                     friends = [d_users[i][1] for i in range(n_users)]
                     urls = [i[0] for i in user_clicks]
-                    friends_clicks = [[u[0], u[1], u[2]] for u in query_features[query_id] if u[1] in friends and u[0] in urls]
+                    friends_clicks = [[u[0], u[1], u[2]] for u in query_features[query_id] if int(u[1]) in friends and u[0] in urls]
                     for cl in friends_clicks:
                         d = Cos(users_vector[int(cl[1])], users_vector[int(user_id)])
-                        if (d >= 0.9):
+                        if (d >= 0.6):
                             #weight = (n_trainig_days_-cl[2]) / n_trainig_days_
                             weight = 1./ math.sqrt(n_trainig_days_ - cl[2])
                             #weight = 1.

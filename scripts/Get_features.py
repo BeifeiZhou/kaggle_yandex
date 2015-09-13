@@ -216,25 +216,36 @@ class Working_with_data(object):
         self.train_data = open(train_data_file, 'w')
         self.Get_data(data_file)
 
-def Get_users_for_queries(data_file):
+def Get_users_for_queries(data_file, res_file):
     queries = {}
+    user_id = 0
+    query = 0
+    user_clicks = []
     with open(data_file) as data:
         for line_n, line in enumerate(data):
             if (line_n%10**6 == 0):
                 print(line_n)
             line = line.strip().split("\t")
-            if (line_n%10 == 0 and int(line[3]) < 24):
-                if (line[2] not in queries):
-                    queries[line[2]] = Get_random_vector(100)
-                queries[line[2]].append(line[0])
-    #with open(res_file, 'w') as res:
-    #    for q in queries.keys():
-    #        res.write(q + "\t" + "\t".join(str(u) for u in queries[q]) + "\n")
+            if (not line_n%10 == 0):
+                user_clicks.append([int(line[-2]), int(line[-1])])
+            if (line_n%10 == 0 and int(line[3]) < 24 and len(user_clicks) > 0):
+                user_clicks.sort(key=lambda x: x[1])
+                if (not user_clicks[0][0] == max([user_clicks[i][0] for i in range(len(user_clicks))])):
+                    if (query not in queries):
+                        queries[query] = []#Get_random_vector(100)
+                    queries[query].append(user_id)
+                user_id = line[0]
+                query = line[2]
+                user_clicks = [[int(line[-2]), int(line[-1])]]
+    with open(res_file, 'w') as res:
+        for q in queries.keys():
+            if (len(queries[q]) > 1):
+                res.write(str(q) + "\t" + "\t".join(str(u) for u in queries[q]) + "\n")
     return queries
 
 def Get_user_features(data_file, res):
     dim = 100
-    n_train_days = 24
+    n_train_days = 25
     queries = Get_users_for_queries(data_file)
     users = {}
     users_urls = {}
@@ -352,4 +363,5 @@ def Get_ndcg_for_one_ex(ex, truth):
 
 
 #data = Working_with_data("../../data/train", "../../data/testW2V", "../../data/trainW2V")
-Get_user_features("../../data/trainW2V", "../../data/users_for_queriesW2V")
+Get_users_for_queries('../../data/trainW2V', '../../data/QueryUsers')
+#Get_user_features("../../data/trainW2V", "../../data/users_for_queriesW2V")

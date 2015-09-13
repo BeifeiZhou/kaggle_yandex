@@ -48,6 +48,7 @@ class Working_with_data(object):
         #assume that first M,then Q,then C
         #self.data_by_sessions = {}
         one_session = {}
+        serp_clicks = []
         with open(data_file) as data,open('../my_data/train', 'w') as result:
             for i,line in enumerate(data):
                 if (i%10**6 == 0):

@@ -1,45 +1,7 @@
-from W2V import *
+__author__ = 'anna'
+
 from get_items import *
-
-dim = 300
-n_trainig_days_ = 25
-c_q = 0.95
-
-def Get_features(queries_name):
-    res = {}
-    for q in queries_name:
-        res[q] = Get_random_vector(dim)
-    return res
-
-def Get_queries_features(data_file, users_features, query_names):
-    res = {}
-    for q in query_names:
-        res[q] = [0 for i in range(dim)]
-    with open(data_file) as data:
-        for line_n, line in enumerate(data):
-            if (line_n%10**6 == 0):
-                print(line_n)
-            line = line.strip().split("\t")
-            if (line_n % 10 == 0 and int(line[3]) < n_trainig_days_):
-                for i in range(dim):
-                    weight = c_q**(n_trainig_days_ - int(line[3]))
-                    res[int(line[2])][i] += users_features[int(line[0])][i]
-    return res
-
-def Get_url_features(data_file, users_features, urls_names):
-    res = {}
-    for u in urls_names:
-        res[u] = [0 for i in range(dim)]
-    with open(data_file) as data:
-        for line_n, line in enumerate(data):
-            if (line_n%10**6 == 0):
-                print(line_n)
-            line = line.strip().split("\t")
-            if (int(line[5]) == 2 and int(line[3]) < n_trainig_days_):
-                for i in range(dim):
-                    weight = c_q**(n_trainig_days_ - int(line[3]))
-                    res[int(line[4])][i] += users_features[int(line[0])][i]
-    return res
+from Create_features_as_summ_urls import *
 
 def Get_query_click_probability(user_history):
     for q in user_history.keys():

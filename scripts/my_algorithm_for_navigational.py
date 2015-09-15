@@ -2,6 +2,7 @@ from W2V import *
 
 dim = 300
 n_trainig_days_ = 25
+n_validation_days = 22
 
 def Get_queries(data_file):
     queries_name = []
@@ -117,7 +118,7 @@ def Get_new_features_for_query(data_file, queries_name):
                 print(line_n)
             line = line.strip().split("\t")
             if (line_n%10 != 0):
-                user_clicks.append([line[4], int(line[5])])
+                user_clicks.append([int(line[4]), int(line[5])])
             else:
                 if (len(user_clicks) > 0 and day >= n_trainig_days_ - 21 and day < n_trainig_days_):
                     truth = max (u[1] for u in user_clicks)
@@ -126,9 +127,9 @@ def Get_new_features_for_query(data_file, queries_name):
                         for c in clicks:
                             for url in clicks:
                                 res[query_id].append([url, user_id, day])
-                user_clicks = [[line[4], int(line[5])]]
-                query_id = line[2]
-                user_id = line[0]
+                user_clicks = [[int(line[4]), int(line[5])]]
+                query_id = int(line[2])
+                user_id = int(line[0])
                 day = int(line[3])
     return res
 

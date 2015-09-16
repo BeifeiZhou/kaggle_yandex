@@ -6,7 +6,7 @@ from Create_features_as_summ_urls import *
 n_validation_days = 22
 n_training_days= 25
 
-def Get_local_features(url, query, user,  urls_vector, query_vector, users_vector, user_clicks, user_history):
+def Get_local_features(url, query, user, rank,  urls_vector, query_vector, users_vector, user_clicks, user_history):
 
     urls_in_query = [u[0] for u in user_clicks]
     scalar_products_on_urls = {}
@@ -23,7 +23,7 @@ def Get_local_features(url, query, user,  urls_vector, query_vector, users_vecto
 
     different_queries = len(user_history.keys())
     return [scalar_products_on_urls[u] for u in urls_in_query] + [click_count_to_url_user, click_count_to_url_query, click_cout_to_url,
-                                                                  query_count, query_count_user, different_queries]
+                                                                  query_count, query_count_user, different_queries, rank]
 
 def Get_result(data_file, learn_train_file, test_file,
                urls_vector, query_features, users_vector):
@@ -43,9 +43,9 @@ def Get_result(data_file, learn_train_file, test_file,
             else:
                 if (day >= n_validation_days and len(user_clicks) > 0):
                     user_clicks.sort(key = lambda x: x[2])
-                    for url_info in user_clicks:
+                    for rank,url_info in enumerate(user_clicks):
                         url = url_info[0]
-                        features = Get_local_features(url, query_id, user_id,  urls_vector,
+                        features = Get_local_features(url, query_id, user_id, rank, urls_vector,
                                                 query_features, users_vector, user_clicks, user_history)
                         if (day >= n_training_days):
                             test.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")

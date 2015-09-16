@@ -1,7 +1,7 @@
 from linear_regression_and_hash_features import *
 
 class Train_model(object):
-    def __init__(self, train_file, my_test_file, test_file):
+    def __init__(self, train_file, test_file):
         self.train = open(train_file)
         self.test = open(test_file)
         self.learner = Linear_regression(0.1,1.,1.,1.)
@@ -14,7 +14,7 @@ class Train_model(object):
             if (i%10**6 == 0):
                 print(i)
             line = line.strip().split('\t')
-            ex = [int(feature) for feature in line[:-1]]
+            ex = [float(feature) for feature in line[:-1]]
             truth = float(int(line[-1]) >= 2)
             self.learner.one_step(ex, truth)
         file.close()
@@ -25,12 +25,10 @@ class Train_model(object):
 
     def run_test(self, test_file):
         session = []
-        session_id = ''
+        correct_answer = 0
+        n_answers = 0
         with open(test_file, 'w') as res_file:
-            res_file.write("SessionID,URLID\n")
             for line_n,line in enumerate(self.test):
-                if (line_n > 10**6):
-                    break
                 if (line_n%10**6 == 0):
                     print(line_n)
                 line = line.strip().split('\t')
@@ -41,14 +39,19 @@ class Train_model(object):
                         for s in session:
                             results.append([s[0], self.learner.res(s[1]), s[2]])
                         results.sort(key=lambda x:-x[1])
-                        for r in results:
-                            res_file.write(str(r[0]) + "," + str(r[1]) + "," + str(r[2])+"\n")
+                        urls_with_max_score = [r for r in results if abs(r[1] - results[0][1]) < 1e-10]
+                        urls_with_max_score.sort(key = lambda x:x[0])
+                        max_truth = max(r[2] for r in results)
+                        if (int(max_truth) == int(urls_with_max_score[0][2])):
+                            correct_answer += 1
+                        n_answers += 1
                     session = []
                     if (len(line) > 1):
-                        session.append([line_n/10,[int(i) for i in line[:-1]], line[-1]])
+                        session.append([line_n%10,[float(i) for i in line[:-1]], float(line[-1])])
                 else:
-                    session.append([line_n/10, [int(i) for i in line[:-1]], line[-1]])
+                    session.append([line_n%10, [float(i) for i in line[:-1]], float(line[-1])])
+        return [correct_answer, n_answers]
 
-#tr = Train_model("../../data/my_train", "../../data/my_test", "../../data/my_test")
-#tr.trainer()
-#tr.run_test("../../data/res")
+tr = Train_model("../../my_data_basic/validation", "../../my_data_basic/validation")
+tr.trainer()
+print(tr.run_test("../../data/res"))

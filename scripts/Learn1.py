@@ -1,5 +1,5 @@
-__author__ = 'anna'
-from W2V import*
+__author__ = 'annasepliaraskaia'
+
 from get_items import *
 from Create_features_as_summ_urls import *
 
@@ -15,11 +15,12 @@ def Get_local_features(url, query, user,  urls_vector, query_vector, users_vecto
         scalar_products_on_urls[url_] = Scalar_vectors(urls_vector[url_], users_vector[user])
 
     click_count_to_url_user = Scalar_vectors(urls_vector[url], users_vector[user])
-    click_count_to_url_query = click_count_to_url_user * (scalar_products_on_urls[url] /
-                                                     sum(scalar_products_on_urls[k]) for k in urls_in_query)
+    query_count_user = Scalar_vectors(query_vector[query], users_vector[user])
+    click_count_to_url_query = query_count_user * (scalar_products_on_urls[url] /
+                                                          (sum(scalar_products_on_urls[k] for k in urls_in_query) + 1e-10))
     click_cout_to_url = Scalar_vectors(urls_vector[url], urls_vector[url])
     query_count = Scalar_vectors(query_vector[query], query_vector[query])
-    query_count_user = Scalar_vectors(query_vector[query], users_vector[user])
+
     different_queries = len(user_history.keys())
     return [scalar_products_on_urls[u] for u in urls_in_query] + [click_count_to_url_user, click_count_to_url_query, click_cout_to_url,
                                                                   query_count, query_count_user, different_queries]
@@ -47,7 +48,7 @@ def Get_result(data_file, learn_train_file, test_file,
                         features = Get_local_features(url, query_id, user_id,  urls_vector,
                                                 query_features, users_vector, user_clicks, user_history)
                         if (day >= n_training_days):
-                            test.write("\t".join(str(i) for i in features) + "\n")
+                            test.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
                         else:
                             train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
 
@@ -84,4 +85,3 @@ def main():
                urls_vector, query_features, users_features)
 
 main()
-

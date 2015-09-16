@@ -3,7 +3,6 @@ from linear_regression_and_hash_features import *
 class Train_model(object):
     def __init__(self, train_file, my_test_file, test_file):
         self.train = open(train_file)
-        self.my_test = open(my_test_file)
         self.test = open(test_file)
         self.learner = Linear_regression(0.1,1.,1.,1.)
 
@@ -14,12 +13,9 @@ class Train_model(object):
         for i,line in enumerate(file):
             if (i%10**6 == 0):
                 print(i)
-            if (i > 4*10**6):
-                break
             line = line.strip().split('\t')
             ex = [int(feature) for feature in line[:-1]]
-            ex.sort()
-            truth = float(line[-1] >= 0)
+            truth = float(int(line[-1]) >= 2)
             self.learner.one_step(ex, truth)
         file.close()
 

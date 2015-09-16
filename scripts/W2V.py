@@ -9,7 +9,7 @@ def Get_random_vector(dim):
         res_norm += coordinate**2
         res.append(coordinate)
     for i in range(dim):
-        res[i] /= res_norm
+        res[i] /= math.sqrt(res_norm)
     return res
 
 def Scalar_vectors(x,y):

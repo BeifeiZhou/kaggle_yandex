@@ -2,7 +2,7 @@ __author__ = 'anna'
 from W2V import *
 
 
-dim = 300
+dim = 500
 n_validation_days = 22
 n_trainig_days_ = 25
 c_q = 0.95
@@ -15,6 +15,7 @@ def Get_features(queries_name):
 
 def Get_queries_features(data_file, users_features, query_names):
     res = {}
+    print("queries")
     for q in query_names:
         res[q] = [0 for i in range(dim)]
     with open(data_file) as data:
@@ -30,6 +31,7 @@ def Get_queries_features(data_file, users_features, query_names):
 
 def Get_url_features(data_file, users_features, urls_names):
     res = {}
+    print("urls")
     for u in urls_names:
         res[u] = [0 for i in range(dim)]
     with open(data_file) as data:

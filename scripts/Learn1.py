@@ -23,7 +23,7 @@ def Get_local_features(url, query, user, rank,  urls_vector, query_vector, users
 
     different_queries = len(user_history.keys())
     return [scalar_products_on_urls[u] for u in urls_in_query] + [click_count_to_url_user, click_count_to_url_query, click_cout_to_url,
-                                                                  query_count, query_count_user, different_queries, rank]
+                                                                  query_count, query_count_user, different_queries]
 
 def Get_result(data_file, learn_train_file, test_file,
                urls_vector, query_features, users_vector):

@@ -1,9 +1,10 @@
 from linear_regression_and_hash_features import *
 
 class Train_model(object):
-    def __init__(self, train_file, test_file):
+    def __init__(self, train_file, test_file, n_bins):
         self.train = open(train_file)
         self.test = open(test_file)
+        self.n_bins = n_bins
         self.learner = Linear_regression(0.1,1.,1.,1.)
 
     def train_by_one_file(self, file_index):
@@ -15,6 +16,7 @@ class Train_model(object):
                 print(i)
             line = line.strip().split('\t')
             ex = [float(feature) for feature in line[:-1]]
+            ex = HashFeatures(ex, [str(i) for i in range(len(ex))], self.n_bins)
             truth = float(int(line[-1]) >= 2)
             self.learner.one_step(ex, truth)
         file.close()
@@ -37,7 +39,7 @@ class Train_model(object):
                     if (len(session) > 0):
                         results = []
                         for s in session:
-                            results.append([s[0], self.learner.res(s[1]), s[2]])
+                            results.append([s[0], self.learner.res(HashFeatures(s[1], [str(i) for i in range(len(s[1]))], self.n_bins)), s[2]])
                         results.sort(key=lambda x:-x[1])
                         urls_with_max_score = [r for r in results if abs(r[1] - results[0][1]) < 1e-10]
                         urls_with_max_score.sort(key = lambda x:x[0])
@@ -52,6 +54,6 @@ class Train_model(object):
                     session.append([line_n%10, [float(i) for i in line[:-1]], float(line[-1])])
         return [correct_answer, n_answers]
 
-tr = Train_model("../../my_data_basic/validation", "../../my_data_basic/validation")
+tr = Train_model("../../my_data_basic/validation", "../../my_data_basic/testForIdea", 2**30)
 tr.trainer()
 print(tr.run_test("../../data/res"))

@@ -58,7 +58,7 @@ def Get_local_features(user_history, user_clicks, query, url, rank, urls_counts,
     click_cout_to_url = urls_counts[url]
     query_count = query_counts[query]
     return [url_statistic[u] for u in urls] + [click_count_to_url_user, click_count_to_url_query, click_cout_to_url,
-                                                                  query_count, query_count_user, different_queries, rank]
+                                                                  query_count, query_count_user, different_queries]
 
 
 def Get_result(data_file, learn_train_file, test_file, urls_counts, query_counts):

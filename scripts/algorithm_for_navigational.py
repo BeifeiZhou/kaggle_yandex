@@ -41,17 +41,20 @@ def Get_users_for_queries(data_file):
     n_right_prediction_navigation = 0
     n_predictions = 0
     n_right_actually_prediction_navigation = 0
-    with open(data_file) as data:
+    lines = []
+    with open(data_file) as data, open("../../data/trainW2V_small", 'w') as n_train:
         for line_n, line in enumerate(data):
             if (line_n%10**6 == 0):
                 print(line_n)
+            line1 = line
             line = line.strip().split("\t")
             if (not line_n%10 == 0):
                 user_clicks.append([int(line[-3]), int(line[-2]), int(line[-1])])
+                lines.append(line1.strip())
 
             if (line_n%10 == 0 and len(user_clicks) > 0):
                 user_clicks.sort(key=lambda x: x[-1])
-                if (day >= 25):
+                if (day >= 22):
                     navigational, basic, prediction_done, actually_prediction_navigation = \
                         Get_prediction(user_query_train, query, user_clicks)
                     n_all_queries += 1
@@ -59,7 +62,11 @@ def Get_users_for_queries(data_file):
                     n_right_prediction_basic += basic
                     n_predictions += prediction_done
                     n_right_actually_prediction_navigation += actually_prediction_navigation
+                    if (actually_prediction_navigation < 1):
+                        n_train.write("\n".join(l for l in lines) + "\n")
                 else:
+                    
+                    n_train.write("\n".join(l for l in lines) + "\n")
                     truth = max([user_clicks[i][1] for i in range(len(user_clicks))])
                     if (truth >= 0):
                         prediction = [i[0] for i in user_clicks if i[1] == truth]
@@ -78,11 +85,12 @@ def Get_users_for_queries(data_file):
                 user_clicks = [[int(line[-3]), int(line[-2]), int(line[-1])]]
                 query = line[2]
                 day = int(line[3])
+		lines = [line1.strip()]
                 if (user_id != line[0]):
                     user_id = line[0]
                     user_query_train = {}
     print ("Basic result = " + str(n_right_prediction_basic) + "," + str(n_all_queries) + "\t" + str(float(n_right_prediction_basic)/n_all_queries))
     print ("Navigational result = " + str(n_right_prediction_navigation) + "," + str(n_all_queries) +
-           "\t" + str(float(n_right_actually_prediction_navigation)/n_predictions)+"\t" + str(float(n_right_prediction_navigation)/n_all_queries))
+           "\t" + str(n_right_actually_prediction_navigation) + "\t" + str(n_predictions)+"\t" + str(float(n_right_prediction_navigation)/n_all_queries))
 
 Get_users_for_queries("../../data/trainW2V")

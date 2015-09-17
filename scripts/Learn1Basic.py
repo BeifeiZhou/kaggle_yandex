@@ -58,7 +58,7 @@ def Get_local_features(user_history, user_clicks, query, url, rank, urls_counts,
     click_cout_to_url = urls_counts[url]
     query_count = query_counts[query]
     return [url_statistic[u] for u in urls] + [click_count_to_url_user, click_count_to_url_query, click_cout_to_url,
-                                                                  query_count, query_count_user, different_queries]
+                                                                  query_count, query_count_user, different_queries, rank]
 
 
 def Get_result(data_file, learn_train_file, test_file, urls_counts, query_counts):
@@ -84,7 +84,8 @@ def Get_result(data_file, learn_train_file, test_file, urls_counts, query_counts
                         if (day >= n_training_days):
                             test.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
                         else:
-                            train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
+                            if (max(u[1] for u in user_clicks) > 1):
+                                train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
 
                 elif(len(user_clicks) > 0 and int(line[3]) >= n_validation_days - 21):
                     for cl in user_clicks:

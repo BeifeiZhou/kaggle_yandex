@@ -2,24 +2,21 @@ from linear_regression_and_hash_features import *
 
 class Train_model(object):
     def __init__(self, train_file, test_file, n_bins):
-        self.train = open(train_file)
+        self.train = train_file
         self.test = open(test_file)
         self.n_bins = n_bins
         self.learner = Linear_regression(0.1,1.,1.,1.)
 
     def train_by_one_file(self, file_index):
-        file = self.train
-        if (file_index == 1):
-            file = self.my_test
-        for i,line in enumerate(file):
-            if (i%10**6 == 0):
-                print(i)
-            line = line.strip().split('\t')
-            ex = [float(feature) for feature in line[:-1]]
-            ex = HashFeatures(ex, [str(i) for i in range(len(ex))], self.n_bins)
-            truth = float(int(line[-1]) >= 2)
-            self.learner.one_step(ex, truth)
-        file.close()
+        with open(self.train) as file:
+            for i,line in enumerate(file):
+                if (i%10**6 == 0):
+                    print(i)
+                line = line.strip().split('\t')
+                ex = [float(feature) for feature in line[:-1]]
+                ex = HashFeatures(ex, [str(i) for i in range(len(ex))], self.n_bins)
+                truth = float(int(line[-1]) >= 2)
+                self.learner.one_step(ex, truth)
 
     def trainer(self):
         self.train_by_one_file(0)
@@ -54,6 +51,6 @@ class Train_model(object):
                     session.append([line_n%10, [float(i) for i in line[:-1]], float(line[-1])])
         return [correct_answer, n_answers]
 
-tr = Train_model("../../my_data_basic/validation", "../../my_data_basic/testForIdea", 2**30)
+tr = Train_model("../../my_data/validation", "../../my_data/testForIdea", 2**30)
 tr.trainer()
 print(tr.run_test("../../data/res"))

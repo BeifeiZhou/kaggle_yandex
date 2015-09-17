@@ -362,6 +362,6 @@ def Get_ndcg_for_one_ex(ex, truth):
 
 
 
-#data = Working_with_data("../../data/train", "../../data/testW2V", "../../data/trainW2V")
-Get_users_for_queries('../../data/trainW2V', '../../data/QueryUsers')
+data = Working_with_data("../../data/train", "../../data/testW2V", "../../data/trainW2V")
+#Get_users_for_queries('../../data/trainW2V', '../../data/QueryUsers')
 #Get_user_features("../../data/trainW2V", "../../data/users_for_queriesW2V")

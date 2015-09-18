@@ -19,7 +19,7 @@ def Load_data(data_file):
 
 def Train(train):
     dtrain = xgb.DMatrix(np.array(train[0]), label=np.array(train[1]))
-    gbm = xgb.XGBClassifier(max_depth=3, n_estimators=400, learning_rate=0.2).fit(train[0], train[1])
+    gbm = xgb.XGBClassifier(max_depth=1, n_estimators=1000, learning_rate=0.05).fit(train[0], train[1])
 
     return gbm
 
@@ -75,11 +75,11 @@ def run_test(test_file, gbm):
         return [correct_answer, n_answers,  n_right_actually_prediction, n_predictions]
 
 def main():
-    train_data = Load_data("../../data/validation")
+    train_data = Load_data("../../my_data/validation_new")
     gbm = Train(train_data)
     #gbm.save_model('my.model')
     #gbm.dump_model('dump.raw.txt', 'featmap.txt')
-    print(run_test("../../data/testForIdea", gbm))
-    #print(run_test("../../my_data/validation", gbm))
+    print(run_test("../../my_data/test_new", gbm))
+    print(run_test("../../my_data/validation_new", gbm))
 
 main()

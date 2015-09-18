@@ -51,6 +51,6 @@ class Train_model(object):
                     session.append([line_n%10, [float(i) for i in line[:-1]], float(line[-1])])
         return [correct_answer, n_answers]
 
-tr = Train_model("../../my_data/validation", "../../my_data/testForIdea", 2**30)
+tr = Train_model("../../my_data/validation_st", "../../my_data/test_st", 2**30)
 tr.trainer()
 print(tr.run_test("../../data/res"))

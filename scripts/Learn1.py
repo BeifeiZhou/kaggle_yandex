@@ -28,6 +28,21 @@ def Get_click_statistic_by_neighbours(url, users_neughbours,  urls_vector,
         click_statistic_by_n.append(Scalar_vectors(urls_vector[url], users_vector[user_]) / (click_summ[user_] + 1e-10))
     return click_statistic_by_n
 
+def Get_user_prediction(user_history, user_click, query_vector, urls_vector, query):
+    query_feature = query_vector[query]
+    click_predicion = {}
+    for u in user_click:
+        click_predicion[u[0]] = 0
+    for u in user_click:
+        url_feature = urls_vector[u[0]]
+        for q in user_history.keys():
+            d = Cos(query_feature, query_vector[q])
+            if (d > 0.9):
+                for url in user_history[q]:
+                     d_u = Cos(url_feature, urls_vector[url])
+                     if (url == u[0]):
+                         click_predicion[u[0]] += d* d_u * user_history[q][url]
+    return click_predicion
 
 def Get_local_features(url, query, user, rank,  urls_vector, query_vector, users_vector, user_clicks, user_history,
                        users_neighbours):
@@ -53,16 +68,26 @@ def Get_local_features(url, query, user, rank,  urls_vector, query_vector, users
                                                 Get_click_statistic_by_neighbours(url, users_neighbours,  urls_vector,
                                                                                                   users_vector, urls_in_query)
 
-def Get_result(data_file, learn_train_file, test_file,
+def Get_result(data_file,
                urls_vector, query_features, users_vector,
-               users_neighbours):
+               users_neighbours,
+               validation_files,
+               test_files):
     user_history = {}
     user_clicks = []
     query_id = -1
     user_id = -1
     day = -1
+    user_position_baies = [0 for i in range(10)]
 
-    with open(data_file) as data, open(learn_train_file, 'w') as train, open(test_file, 'w') as test:
+    with open(data_file) as data, \
+            open(validation_files[0], 'w') as v_n,\
+            open(validation_files[1], 'w') as v_s_s,\
+            open(validation_files[2], 'w') as v_s,\
+            open(test_files[0], 'w') as t_n,\
+            open(test_files[1], 'w') as t_s_s,\
+            open(test_files[2], 'w') as t_s\
+            :
         for line_n, line in enumerate(data):
             if (line_n%10**4 == 0):
                 print(line_n)
@@ -78,16 +103,33 @@ def Get_result(data_file, learn_train_file, test_file,
                                                 query_features, users_vector, user_clicks, user_history,
                                                 users_neighbours[user_id])
 
+
+                        str_to_write = "\t".join(str(i) for i in features) \
+                                       + "\t" + "\t".join(str(i) for i in user_position_baies) \
+                                        +"\t" + str(url_info[1]) + "\n"
+                        query_st = features[13]
                         if (day >= n_training_days):
-                            test.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
+                            if (query_st < 1):
+                                t_n.write(str_to_write)
+                            elif (query_st < 10):
+                                t_s_s.write(str_to_write)
+                            else:
+                                t_s.write(str_to_write)
                         else:
-                            train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
                             if (max(u[1] for u in user_clicks) > 1):
-                                train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
+                                if (query_st < 1):
+                                    v_n.write(str_to_write)
+                                elif (query_st < 10):
+                                    v_s_s.write(str_to_write)
+                                else:
+                                    v_s.write(str_to_write)
+                            #if (max(u[1] for u in user_clicks) > 1):
+                            #    train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
 
                 elif(len(user_clicks) > 0 and int(line[3]) >= n_validation_days - 21):
                     for cl in user_clicks:
                         if (cl[1] == 2):
+                            user_position_baies[cl[2]] += 1
                             if (int(query_id) not in user_history):
                                 user_history[int(query_id)] = {}
                             if (int(cl[0]) not in user_history[int(query_id)]):
@@ -95,6 +137,7 @@ def Get_result(data_file, learn_train_file, test_file,
                             user_history[int(query_id)][int(cl[0])] += 1
                 if (user_id != int(line[0])):
                     user_history = {}
+                    user_position_baies = [0 for i in range(10)]
 
                 user_clicks = [[int(line[4]), int(line[5]), int(line[6])]]
                 query_id = int(line[2])
@@ -102,9 +145,19 @@ def Get_result(data_file, learn_train_file, test_file,
                 day = int(line[3])
 
 def main():
+    directory = "../../my_data/"
     data_file = "../../data/trainW2V_small"
-    test_file = "../../data/testForIdea"
-    validation_file = "../../data/validation"
+
+    validation_file_new =  directory + "validation_new"
+    validation_with_some_statistic = directory + "validation_a_few_st"
+    validation_with_stat = directory + "validation_st"
+    validation_files = [validation_file_new, validation_with_some_statistic, validation_with_stat]
+
+    test_file_new = directory + "test_new"
+    test_with_some_statistic = directory + "test_a_few_st"
+    test_with_stat = directory + "test_st"
+    tests_file = [test_file_new, test_with_some_statistic, test_with_stat]
+
 
     queries_name = Get_queries(data_file)
     urls_name = Get_urls(data_file)
@@ -116,8 +169,8 @@ def main():
 
     users_neighbours = Get_user_neighbours("../../data/users_neighbours")
 
-    Get_result(data_file, validation_file, test_file,
+    Get_result(data_file,
                urls_vector, query_features, users_features,
-               users_neighbours)
+               users_neighbours, validation_files, tests_file)
 
 main()

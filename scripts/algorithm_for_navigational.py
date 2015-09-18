@@ -42,7 +42,7 @@ def Get_users_for_queries(data_file):
     n_predictions = 0
     n_right_actually_prediction_navigation = 0
     lines = []
-    with open(data_file) as data, open("../../data/trainW2V_small", 'w') as n_train:
+    with open(data_file) as data, open("../../data/trainW2V_small_del", 'w') as n_train:
         for line_n, line in enumerate(data):
             if (line_n%10**6 == 0):
                 print(line_n)
@@ -62,7 +62,7 @@ def Get_users_for_queries(data_file):
                     n_right_prediction_basic += basic
                     n_predictions += prediction_done
                     n_right_actually_prediction_navigation += actually_prediction_navigation
-                    if (actually_prediction_navigation < 1):
+                    if (prediction_done < 1):
                         n_train.write("\n".join(l for l in lines) + "\n")
                 else:
                     

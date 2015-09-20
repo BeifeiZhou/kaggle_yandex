@@ -1,6 +1,6 @@
 __author__ = 'anna'
 
-import xgboost as xgb
+from sklearn import svm
 import numpy as np
 
 def Load_data(data_file):
@@ -12,23 +12,16 @@ def Load_data(data_file):
                 print(i)
             line = line.strip().split('\t')
             ex = [float(feature) for feature in line[:-1]]
-            t = int(line[-1])
-            truth = 0
-            #if (t == -1):
-            #    truth = 0.
-            if (t == 2):
-                truth = 1.
-           # truth = float(int(line[-1]) >= 2)
-            if (truth >= 0):
-                res.append(ex)
-                labels.append(truth)
+            truth = float(int(line[-1]) >= 2)
+            res.append(ex)
+            labels.append(truth)
     return [res, labels]
 
 def Train(train):
-    dtrain = xgb.DMatrix(np.array(train[0]), label=np.array(train[1]))
-    gbm = xgb.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05).fit(train[0], train[1])
+    clf = svm.SVC()
+    clf.fit(train[0], train[1])
 
-    return gbm
+    return clf
 
 def run_test(test_file, gbm):
         session = []
@@ -48,16 +41,7 @@ def run_test(test_file, gbm):
                     if (len(session) > 0):
                         session = np.array(session)
                         #truth = np.array(labels)
-                        #predictions = gbm.predict(session)
-                        #max_couter = max(session[0][12:22])
-                        predictions= [0 for i in range(10)]
-                        #if (session[0][13] != max_couter and max_couter > 10 and session[0][13] < 2 * max_couter):
-                        #s = 0
-                        #while(max(predictions) < 1):
-                        #    if (session[0][s+12] >= max_couter):
-                        #        predictions[s] = 1
-                        #    s += 1
-
+                        predictions = gbm.predict(session)
                         if (max(predictions) > 0):
                             res.write("\t".join(str(i) for i in predictions) + "\n")
                             res.write("\t".join(str(i) for i in labels) + "\n\n")
@@ -91,12 +75,11 @@ def run_test(test_file, gbm):
         return [correct_answer, n_answers,  n_right_actually_prediction, n_predictions]
 
 def main():
-    #train_data = Load_data("../../data/validation")
-    gbm = 1
-    #gbm = Train(train_data)
+    train_data = Load_data("my_validation")
+    gbm = Train(train_data)
     #gbm.save_model('my.model')
     #gbm.dump_model('dump.raw.txt', 'featmap.txt')
-    print(run_test("../../data/testForIdea", gbm))
-    #print(run_test("../../data/validation", gbm))
+    print(run_test("my_test", gbm))
+    print(run_test("my_validation", gbm))
 
 main()

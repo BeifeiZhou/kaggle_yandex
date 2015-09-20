@@ -67,7 +67,7 @@ def Scalar_product(x,y):
         res += y[x_i]
     return res
 
-def HashFeatures(features, feature_names,n_bins):
+def HashFeatures(features, feature_names,n_bins)HashFeatures(features, feature_names,n_bins)HashFeatures(features, feature_names,n_bins)HashFeatures(features, feature_names,n_bins):
     hash_features = []
     for i,f in enumerate(features):
         h_f = abs((hash(feature_names[i] + "___" + str(f)) % n_bins)) + 1

@@ -116,7 +116,10 @@ def Get_result(data_file,
                             else:
                                 t_s.write(str_to_write)
                         else:
-                            if (max(u[1] for u in user_clicks) > 1):
+                            r = 1
+                            if (user_clicks[0][1] > 1):
+                                r = random.randint(0,9)
+                            if (max(u[1] for u in user_clicks)):
                                 if (query_st < 1):
                                     v_n.write(str_to_write)
                                 elif (query_st < 10):
@@ -146,7 +149,7 @@ def Get_result(data_file,
 
 def main():
     directory = "../../my_data/"
-    data_file = "../../data/trainW2V_small"
+    data_file = "../../big_data/trainW2V_small"
 
     validation_file_new =  directory + "validation_new"
     validation_with_some_statistic = directory + "validation_a_few_st"

@@ -172,7 +172,7 @@ class Working_with_data(object):
 
         with open(data_file) as data:
             for i,line in enumerate(data):
-                if (i%10**6 == 0):
+                if (i%10**5 == 0):
                     print(i)
                 if (n_users > 10**5):
                     break

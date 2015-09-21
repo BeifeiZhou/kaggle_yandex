@@ -49,10 +49,10 @@ def Get_new_data(data_file,res_file, queries):
                 res.write(line)
 
 def main():
-    data_file = "../../big_data/trainW2V"
+    data_file = "../../big_data/trainW2V_small"
     urls_name, queries_name = Get_small_data(data_file)
-    q_names_small = set([q for q in queries_name if random.randint(0,4) == 0])
-    Get_new_data(data_file,"../../big_data/trainW2V_small", q_names_small)
+    q_names_small = set([q for q in queries_name if random.randint(0,10) == 0])
+    Get_new_data(data_file,"../../big_data/trainW2V_small_small", q_names_small)
 
 main()
 

@@ -174,8 +174,8 @@ class Working_with_data(object):
             for i,line in enumerate(data):
                 if (i%10**5 == 0):
                     print(i)
-                if (n_users > 10**5):
-                    break
+                #if (n_users > 10**5):
+                #    break
                 line = line.strip().split('\t')
                 session_id = line[0]
                 if (len(line) == 4):
@@ -362,6 +362,6 @@ def Get_ndcg_for_one_ex(ex, truth):
 
 
 
-data = Working_with_data("../../data/train", "../../data/testW2V", "../../data/trainW2V")
+data = Working_with_data("../../data/train", "../../data/testW2V", "../../big_data/trainW2V")
 #Get_users_for_queries('../../data/trainW2V', '../../data/QueryUsers')
 #Get_user_features("../../data/trainW2V", "../../data/users_for_queriesW2V")

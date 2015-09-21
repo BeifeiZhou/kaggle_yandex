@@ -49,14 +49,14 @@ def run_test(test_file, gbm):
                         session = np.array(session)
                         #truth = np.array(labels)
                         #predictions = gbm.predict(session)
-                        #max_couter = max(session[0][12:22])
+                        max_couter = max(session[0][:10])
                         predictions= [0 for i in range(10)]
                         #if (session[0][13] != max_couter and max_couter > 10 and session[0][13] < 2 * max_couter):
-                        #s = 0
-                        #while(max(predictions) < 1):
-                        #    if (session[0][s+12] >= max_couter):
-                        #        predictions[s] = 1
-                        #    s += 1
+                        s = 0
+                        while(max(predictions) < 1):
+                            if (session[0][ s] >= max_couter):
+                                predictions[s] = 1
+                            s += 1
 
                         if (max(predictions) > 0):
                             res.write("\t".join(str(i) for i in predictions) + "\n")

@@ -27,8 +27,8 @@
       <file leaf-file-name="trainer_XGboost.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/trainer_XGboost.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="825" max-vertical-offset="1800">
-              <caret line="90" column="32" selection-start-line="90" selection-start-column="32" selection-end-line="90" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1905">
+              <caret line="119" column="21" selection-start-line="119" selection-start-column="21" selection-end-line="119" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -56,11 +56,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="algorithm_for_navigational.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="algorithm_for_navigational.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/algorithm_for_navigational.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.63131315" vertical-offset="840" max-vertical-offset="2175">
-              <caret line="81" column="55" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1281" max-vertical-offset="2175">
+              <caret line="104" column="8" selection-start-line="104" selection-start-column="8" selection-end-line="104" selection-end-column="8" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -68,11 +68,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="urls_as_summ_urls.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="urls_as_summ_urls.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/urls_as_summ_urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1335" max-vertical-offset="2565">
-              <caret line="128" column="50" selection-start-line="128" selection-start-column="50" selection-end-line="128" selection-end-column="50" />
+            <state vertical-scroll-proportion="0.116161615" vertical-offset="1836" max-vertical-offset="2670">
+              <caret line="127" column="40" selection-start-line="127" selection-start-column="40" selection-end-line="127" selection-end-column="40" />
               <folding>
                 <element signature="e#33#56#0" expanded="true" />
               </folding>
@@ -105,10 +105,22 @@
       <file leaf-file-name="Learn1Basic.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Learn1Basic.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2138" max-vertical-offset="3405">
-              <caret line="159" column="36" selection-start-line="159" selection-start-column="36" selection-end-line="159" selection-end-column="36" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1515" max-vertical-offset="3480">
+              <caret line="127" column="74" selection-start-line="127" selection-start-column="49" selection-end-line="127" selection-end-column="74" />
               <folding>
                 <element signature="e#34#57#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Get_small_data.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Get_small_data.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="990">
+              <caret line="48" column="19" selection-start-line="48" selection-start-column="19" selection-end-line="48" selection-end-column="19" />
+              <folding>
+                <element signature="e#20#33#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -140,13 +152,13 @@
         <option value="$PROJECT_DIR$/trainer.py" />
         <option value="$PROJECT_DIR$/Get_features.py" />
         <option value="$PROJECT_DIR$/clastering_users.py" />
-        <option value="$PROJECT_DIR$/Get_small_data.py" />
         <option value="$PROJECT_DIR$/Get_urls_as_summ_queries.py" />
         <option value="$PROJECT_DIR$/urls_as_queries_summ.py" />
+        <option value="$PROJECT_DIR$/Get_small_data.py" />
         <option value="$PROJECT_DIR$/Learn1Basic.py" />
-        <option value="$PROJECT_DIR$/urls_as_summ_urls.py" />
-        <option value="$PROJECT_DIR$/trainer_XGboost.py" />
         <option value="$PROJECT_DIR$/algorithm_for_navigational.py" />
+        <option value="$PROJECT_DIR$/trainer_XGboost.py" />
+        <option value="$PROJECT_DIR$/urls_as_summ_urls.py" />
       </list>
     </option>
   </component>
@@ -527,7 +539,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="36" />
+      <option name="time" value="37" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -817,16 +829,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Get_small_data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="448" max-vertical-offset="990">
-          <caret line="53" column="70" selection-start-line="53" selection-start-column="70" selection-end-line="53" selection-end-column="70" />
-          <folding>
-            <element signature="e#20#33#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/my_algorithm_for_query_similiarity.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="1830">
@@ -851,14 +853,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/get_items.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="570">
-          <caret line="11" column="28" selection-start-line="11" selection-start-column="28" selection-end-line="11" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/W2V.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
@@ -876,14 +870,6 @@
           <folding>
             <element signature="e#33#46#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/trainer_XGboost.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="825" max-vertical-offset="1800">
-          <caret line="90" column="32" selection-start-line="90" selection-start-column="32" selection-end-line="90" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -905,32 +891,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/urls_as_summ_urls.py">
+    <entry file="file://$PROJECT_DIR$/get_items.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1335" max-vertical-offset="2565">
-          <caret line="128" column="50" selection-start-line="128" selection-start-column="50" selection-end-line="128" selection-end-column="50" />
-          <folding>
-            <element signature="e#33#56#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="570">
+          <caret line="11" column="28" selection-start-line="11" selection-start-column="28" selection-end-line="11" selection-end-column="28" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Learn1Basic.py">
+    <entry file="file://$PROJECT_DIR$/Get_small_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2138" max-vertical-offset="3405">
-          <caret line="159" column="36" selection-start-line="159" selection-start-column="36" selection-end-line="159" selection-end-column="36" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="990">
+          <caret line="48" column="19" selection-start-line="48" selection-start-column="19" selection-end-line="48" selection-end-column="19" />
           <folding>
-            <element signature="e#34#57#0" expanded="true" />
+            <element signature="e#20#33#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/algorithm_for_navigational.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.63131315" vertical-offset="840" max-vertical-offset="2175">
-          <caret line="81" column="55" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1281" max-vertical-offset="2175">
+          <caret line="104" column="8" selection-start-line="104" selection-start-column="8" selection-end-line="104" selection-end-column="8" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Learn1Basic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1515" max-vertical-offset="3480">
+          <caret line="127" column="74" selection-start-line="127" selection-start-column="49" selection-end-line="127" selection-end-column="74" />
+          <folding>
+            <element signature="e#34#57#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/trainer_XGboost.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1905">
+          <caret line="119" column="21" selection-start-line="119" selection-start-column="21" selection-end-line="119" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/urls_as_summ_urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.116161615" vertical-offset="1836" max-vertical-offset="2670">
+          <caret line="127" column="40" selection-start-line="127" selection-start-column="40" selection-end-line="127" selection-end-column="40" />
+          <folding>
+            <element signature="e#33#56#0" expanded="true" />
           </folding>
         </state>
       </provider>

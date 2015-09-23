@@ -130,7 +130,7 @@ def Get_local_features(user_history, user_clicks, query, url, rank, urls_counts,
 
 def Get_result(data_file, learn_train_file, test_file, urls_counts,
                urls_count_first_time_query, urls_count_first_time,
-               query_counts, clusters):
+               query_counts, train_new_file):
     queries = []
     user_history = {}
     user_clicks = []
@@ -138,14 +138,20 @@ def Get_result(data_file, learn_train_file, test_file, urls_counts,
     user_id = -1
     day = -1
 
-    with open(data_file) as data, open(learn_train_file, 'w') as train, open(test_file, 'w') as test:
+    lines = []
+
+    with open(data_file) as data, open(learn_train_file, 'w') as train, open(test_file, 'w') as test, \
+            open(train_new_file, 'w') as train_new:
         for line_n, line in enumerate(data):
             if (line_n%10**6 == 0):
                 print(line_n)
+            line1 = line.strip()
             line = line.strip().split("\t")
             if (line_n%10 != 0):
                 user_clicks.append([int(line[4]), int(line[5]), int(line[6])])
-            else:
+                lines.append(line1)
+
+            elif(line_n%10 == 0):
                 if (day >= n_validation_days and len(user_clicks) > 0):
                     user_clicks.sort(key = lambda x: x[2])
                     for rank, url_info in enumerate(user_clicks):
@@ -158,20 +164,21 @@ def Get_result(data_file, learn_train_file, test_file, urls_counts,
 
                         if (day >= n_training_days):
                             if (max(abs(cl) for cl in features[:10]) == 0 and features[11] > 100):
-                                features = clusters.Get_result(user_id, query_id, [u[0] for u in user_clicks])
-                                features += [features[rank], rank]
-                                queries.append(query_id)
+                                test.write("\t".join(str(i) for i in features[-13:]) + "\t" + str(url_info[1]) + "\n")
+                                train_new.write(lines[rank] + "\n")
 
-                                test.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
                         else:
                             if (max(u[1] for u in user_clicks) > 1):
                                  if (max(abs(cl) for cl in features[:10]) == 0 and features[11] > 100):
-                                     features = clusters.Get_result(user_id, query_id, [u[0] for u in user_clicks])
                                      features += [features[rank], rank]
                                      queries.append(query_id)
-                                     train.write("\t".join(str(i) for i in features) + "\t" + str(url_info[1]) + "\n")
+                                     train.write("\t".join(str(i) for i in features[-13:]) + "\t" + str(url_info[1]) + "\n")
+                                     train_new.write(lines[rank] + "\n")
+
 
                 elif(len(user_clicks) > 0 and int(day) >= n_validation_days - 21):
+                    train_new.write("\n".join(lines) + "\n")
+
                     for cl in user_clicks:
                         if (cl[1] == 2):
                             if (int(query_id) not in user_history):
@@ -188,22 +195,20 @@ def Get_result(data_file, learn_train_file, test_file, urls_counts,
                 query_id = int(line[2])
                 user_id = int(line[0])
                 day = int(line[3])
+                lines = [line1]
+
     return queries
 
 def main():
     data_file = "../../big_data/trainW2V_small"
-    test_file = "../../data/testForIdea"
-    validation_file = "../../data/validation"
+    test_file = "../../big_data/trainW2V_small_test_baseline"
+    validation_file = "../../big_data/trainW2V_small_validation_baseline"
+
+    new_train = "../../big_data/trainW2V_without_clicks"
 
     queries_name = Get_queries(data_file)
     urls_name = Get_urls(data_file)
     users_name = Get_users(data_file)
-
-    clusters = clastering_users.Clustering(3, users_name, queries_name, data_file)
-    for i in range(1):
-        clusters.One_step_change_query()
-        clusters.One_step_change_users()
-
 
     urls_counts = Get_clicks_for_urls(data_file, urls_name)
     urls_count_first_time_query = Get_clicks_for_urls_first_time_quiry(data_file, queries_name)
@@ -213,7 +218,7 @@ def main():
 
     queries =  Get_result(data_file, validation_file, test_file, urls_counts,
                urls_count_first_time_query, urls_count_first_time,
-               query_counts, clusters)
+               query_counts, new_train)
     queries = set(queries)
     with open("../../big_data/queries", 'w') as d:
         d.write("\n".join(str(q) for q in queries))

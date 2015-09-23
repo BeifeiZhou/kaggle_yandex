@@ -107,9 +107,9 @@ def get_data(data_file, train_f, test_f,
                     for rank, url_info in enumerate(user_clicks):
                         url = url_info[0]
                         features = []
-                        if (sum(np.inner(urls_vector[u[0]], users_vector_as_urls[user_id]) for u in user_clicks) < 0.05):
-                            features = get_local_features(user_clicks, user_id, users_vector_as_queries, users_vector_as_urls,
-                                urls_vector, rank, users_query, query_id)
+                        #if (max(np.inner(urls_vector[u[0]], users_vector_as_urls[user_id]) for u in user_clicks) < 0.05):
+                        features = get_local_features(user_clicks, user_id, users_vector_as_queries, users_vector_as_urls,
+                            urls_vector, rank, users_query, query_id)
 
 
                         if (day >= n_training_days and len(features) > 0):
@@ -125,9 +125,9 @@ def get_data(data_file, train_f, test_f,
                 day = int(line[3])
 
 def main1():
-    data_file = "../../big_data/trainW2V_small_q"
-    test_f = "../../big_data/trainW2V_small_q_test"
-    train_f = "../../big_data/trainW2V_small_q_validation"
+    data_file = "../../big_data/trainW2V"
+    test_f = "../../big_data/trainW2V_small_test_q"
+    train_f = "../../big_data/trainW2V_small_validation_q"
 
     queries_name = Get_queries(data_file)
     urls_name = Get_urls(data_file)
@@ -142,9 +142,16 @@ def main1():
 
     users_query = users_that_entered_query(data_file, queries_name)
 
-    get_data(data_file, train_f, test_f,
-                 users_vector_as_queries, users_vector_as_urls,
-                 urls_vector, users_query)
+    with open("../../big_data/users", 'w') as users:
+        for key in users_vector_as_queries.keys():
+            dist = []
+            for u in users_vector_as_queries.keys():
+                dist.append([u,cos(users_vector_as_queries[key], users_vector_as_queries[u])])
+            dist.sort(key=lambda x:-x[1])
+            users.write(str(u) + "\t" + "\t".join(str(i[0]) + "\t" + str(i[1]) for i in dist[:100]) + "\n")
+    #get_data(data_file, train_f, test_f,
+    #             users_vector_as_queries, users_vector_as_urls,
+    #             urls_vector, users_query)
 
 def get_queries():
     res = []

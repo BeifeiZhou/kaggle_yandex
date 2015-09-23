@@ -68,21 +68,21 @@ def Get_users_for_queries(data_file, urls_vector, users_vector_as_urls):
 
             if (line_n%10 == 0 and len(user_clicks) > 0):
                 user_clicks.sort(key=lambda x: x[-1])
-                if (day < 25 and day >= 22):
+                if (day >= 25):
                     user_prediction = []
                     for q in user_query_train:
                         user_prediction.append(user_query_train[q].prediction)
                     user_prediction = set(user_prediction)
-                    if (sum(np.inner(urls_vector[int(u[0])], users_vector_as_urls[int(user_id)])
-                            for u in user_clicks) < 0.05 and
-                            max(int(u[1]) for u in user_clicks) > 1):
-                        navigational, basic, prediction_done, actually_prediction_navigation = \
+                    #if (sum(np.inner(urls_vector[int(u[0])], users_vector_as_urls[int(user_id)])
+                    #        for u in user_clicks) < 0.05 and
+                    #        max(int(u[1]) for u in user_clicks) > 1):
+                    navigational, basic, prediction_done, actually_prediction_navigation = \
                             Get_prediction(user_prediction, query, user_clicks)
-                        n_all_queries += 1
-                        n_right_prediction_navigation += navigational
-                        n_right_prediction_basic += basic
-                        n_predictions += prediction_done
-                        n_right_actually_prediction_navigation += actually_prediction_navigation
+                    n_all_queries += 1
+                    n_right_prediction_navigation += navigational
+                    n_right_prediction_basic += basic
+                    n_predictions += prediction_done
+                    n_right_actually_prediction_navigation += actually_prediction_navigation
                     #if (prediction_done < 1):
                     #    n_train.write("\n".join(l for l in lines) + "\n")
                 elif(day < 22):
@@ -120,7 +120,7 @@ def Get_users_for_queries(data_file, urls_vector, users_vector_as_urls):
            "\t" + str(n_right_actually_prediction_navigation) + "\t" + str(n_predictions)+"\t" + str(float(n_right_prediction_navigation)/n_all_queries))
 
 def main():
-    data_file = "../../big_data/trainW2V_small_q"
+    data_file = "../../big_data/trainW2V_without_clicks"
     #navigational = Get_navigetional("../../data/query_navigational")
 
     urls_name = Get_urls(data_file)

@@ -59,7 +59,8 @@ def run_test(test_file, gbm):
                         counters = [i for i in session[0][0:10]]
                         counters.sort(key=lambda x: -x)
 
-                        if (counters[0] / counters[1] > 1.5 and counters[0] > 5):
+                        if (counters[0]/counters[1]) > 1.5 and (counters[0] > 5) \
+                            and session[0][0] < 10 :
                             s = 0
                             while(max(predictions) < 1):
                                 if (session[0][s] >= max_couter):
@@ -92,13 +93,19 @@ def run_test(test_file, gbm):
                     labels = []
                     rangs = []
                     if (len(line) > 1):
+                        try:
+                            session.append([float(i) for i in line[:-1]])
+                            labels.append(float(line[-1]))
+                            rangs.append(int(line[-2]))
+                        except:
+                            break
+                else:
+                    try:
                         session.append([float(i) for i in line[:-1]])
                         labels.append(float(line[-1]))
                         rangs.append(int(line[-2]))
-                else:
-                    session.append([float(i) for i in line[:-1]])
-                    labels.append(float(line[-1]))
-                    rangs.append(int(line[-2]))
+                    except:
+                        break
 
         return [correct_answer, n_answers,  n_right_actually_prediction, n_predictions]
 
@@ -109,7 +116,7 @@ def main():
     #gbm = Train(train_data, test_data)
     #gbm.save_model('my.model')
     #gbm.dump_model('dump.raw.txt', 'featmap.txt')
-    print(run_test("../../big_data/trainW2V_small_q_validation_n", gbm))
+    print(run_test("../../big_data/trainW2V_small_test_q", gbm))
     #print(run_test("../../data/validation", gbm))
 
 main()

@@ -1,5 +1,5 @@
 import sys
-from get_items import *
+from urls_as_summ_urls import *
 
 def Get_navigetional(nav_file):
     res = {}
@@ -41,7 +41,7 @@ class query_statistic:
         self.prediction = -1
         self.len = 0
 
-def Get_users_for_queries(data_file, navi):
+def Get_users_for_queries(data_file, urls_vector, users_vector_as_urls):
     #res_navigational = open(res_file_navigational, 'w')
     #res_basic = open(res_file_basic, 'w')
     user_id = 0
@@ -68,23 +68,24 @@ def Get_users_for_queries(data_file, navi):
 
             if (line_n%10 == 0 and len(user_clicks) > 0):
                 user_clicks.sort(key=lambda x: x[-1])
-                if (day >= 25):
+                if (day < 25 and day >= 22):
                     user_prediction = []
                     for q in user_query_train:
-                        if (user_query_train[q].len >= 2 or (user_query_train[q].len >= 1 and
-                                                                 (navi[int(q)] > -10 ))):
-                            user_prediction.append(user_query_train[q].prediction)
+                        user_prediction.append(user_query_train[q].prediction)
                     user_prediction = set(user_prediction)
-                    navigational, basic, prediction_done, actually_prediction_navigation = \
-                        Get_prediction(user_prediction, query, user_clicks)
-                    n_all_queries += 1
-                    n_right_prediction_navigation += navigational
-                    n_right_prediction_basic += basic
-                    n_predictions += prediction_done
-                    n_right_actually_prediction_navigation += actually_prediction_navigation
+                    if (sum(np.inner(urls_vector[int(u[0])], users_vector_as_urls[int(user_id)])
+                            for u in user_clicks) < 0.05 and
+                            max(int(u[1]) for u in user_clicks) > 1):
+                        navigational, basic, prediction_done, actually_prediction_navigation = \
+                            Get_prediction(user_prediction, query, user_clicks)
+                        n_all_queries += 1
+                        n_right_prediction_navigation += navigational
+                        n_right_prediction_basic += basic
+                        n_predictions += prediction_done
+                        n_right_actually_prediction_navigation += actually_prediction_navigation
                     #if (prediction_done < 1):
                     #    n_train.write("\n".join(l for l in lines) + "\n")
-                else:
+                elif(day < 22):
                     #n_train.write("\n".join(l for l in lines) + "\n")
                     truth = max([user_clicks[i][1] for i in range(len(user_clicks))])
                     if (truth >= 0):
@@ -119,7 +120,20 @@ def Get_users_for_queries(data_file, navi):
            "\t" + str(n_right_actually_prediction_navigation) + "\t" + str(n_predictions)+"\t" + str(float(n_right_prediction_navigation)/n_all_queries))
 
 def main():
-    navigational = Get_navigetional("../../data/query_navigational")
-    Get_users_for_queries("../../big_data/trainW2V_medium", navigational)
+    data_file = "../../big_data/trainW2V_small_q"
+    #navigational = Get_navigetional("../../data/query_navigational")
+
+    urls_name = Get_urls(data_file)
+    users_name = Get_users(data_file)
+
+
+    urls_vector = get_features(urls_name, dim)
+    users_vector_as_urls = users_as_sum_urls(data_file, urls_vector, users_name)
+
+    Get_users_for_queries(data_file, urls_vector, users_vector_as_urls)
+
+
+
+
 
 main()

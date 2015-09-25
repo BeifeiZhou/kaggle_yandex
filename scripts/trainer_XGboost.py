@@ -55,17 +55,21 @@ def run_test(test_file, gbm):
                         #predictions = gbm.predict(session)
                         predictions= [0 for i in range(10)]
 
-                        max_couter = max(session[0][0:10])
-                        counters = [i for i in session[0][0:10]]
+                        max_counter = max(session[0][0:10])
+                        counters = [session[0][i]/(i+1.) for i in range(10)]
                         counters.sort(key=lambda x: -x)
+                        max_counter = counters[0]
 
                         if (counters[0]/counters[1]) > 1.5 and (counters[0] > 5) \
-                            and session[0][0] < 10 :
+                           and session[0][0] < 15 :
                             s = 0
-                            while(max(predictions) < 1):
-                                if (session[0][s] >= max_couter):
+                            while(max(predictions) < 1 and s < 10):
+                                if (session[0][s] / (s+1.) >= max_counter):
                                     predictions[s] = 1
                                 s += 1
+
+
+
 
                         if (max(predictions) > 0 and predictions[0] == 0):
 

@@ -74,10 +74,22 @@ def query_emmissed_by_user(data_file, users_names):
         res[u] = set(res[u])
     return res
 
-def get_features(queries_name, dim):
+
+def cliked_document_by_user(data_file, users_names):
+
     res = {}
-    for q in queries_name:
-        res[q] = np.array(Get_random_vector(dim))
+    for u in users_names:
+        res[u] = []
+
+    with open(data_file) as data:
+        for line_n, line in enumerate(data):
+            if line_n%10**6 == 0:
+                print(line_n)
+            line = line.strip().split("\t")
+            if int(line[3]) < n_validation_days and int(line[5]) >= 2:
+                    res[int(line[0])].append(int(line[4]))
+    for u in users_names:
+        res[u] = set(res[u])
     return res
 
 
@@ -87,19 +99,18 @@ def cos(a, b):
 
 def set_similairity(a, b):
     res = float(len(a.intersection(b))) / len(a.union(b))
-    if (len(a.intersection(b)) > 0):
-        print (len(a.intersection(b)), res)
     return res
 
-def get_local_features(user_clicks, user, users_vector_as_urls,
-                       urls_vector, rank, users_query, emmised_queries, query,  users_file):
+def get_local_features(user_clicks, user, clicked_urls,
+                       rank, users_query, emmised_queries, query,  users_file):
 
     n_features = 11
     if query not in users_query:
         return [0 for i in range(n_features)] + [rank]
     #d = [[u, cos(users_vector_as_queries[user], users_vector_as_queries[u])] for u in users_query[query]
     #     if min(users_norm[u], users_norm[user]) / (max(users_norm[u], users_norm[user]) + 1e-10)]
-    d = [[u, set_similairity(emmised_queries[user], emmised_queries[u])] for u in users_query[query]]
+    d = [[u, set_similairity(clicked_urls[user], clicked_urls[u])] for u in users_query[query] if
+              len(clicked_urls[user].intersection(clicked_urls[u])) > 0]
 
     d.sort(key=lambda x: -x[1])
     n_neighbours = min(100, len(d))
@@ -110,19 +121,20 @@ def get_local_features(user_clicks, user, users_vector_as_urls,
     users_file.write(to_write)
     for u_n, u in enumerate(user_clicks):
         for n in range(n_neighbours):
-            features[u_n] += np.inner(urls_vector[u[0]], users_vector_as_urls[d[n][0]])
+            if u[0] in clicked_urls[d[n][0]]:
+                features[u_n] += 1
     return features + [features[rank], rank]
 
 
-def get_data(data_file, train_f, test_f, users_vector_as_urls,
-                 urls_vector, users_query, emmised_queries):
+def get_data(data_file, train_f, test_f, clicked_urls,
+                 users_query, emmised_queries):
     user_clicks = []
     query_id = -1
     user_id = -1
     day = -1
 
     with open(data_file) as data, open(train_f, 'w') as train, open(test_f, 'w') as test, \
-        open("../../big_data/users", 'w') as users:
+        open("../../big_data/users1", 'w') as users:
         for line_n, line in enumerate(data):
             if (line_n%10**4 == 0):
                 print(line_n)
@@ -135,9 +147,9 @@ def get_data(data_file, train_f, test_f, users_vector_as_urls,
                     for rank, url_info in enumerate(user_clicks):
                         url = url_info[0]
                         features = []
-                        if (max(np.inner(urls_vector[u[0]], users_vector_as_urls[user_id]) for u in user_clicks) < 0.05):
-                            features = get_local_features(user_clicks, user_id, users_vector_as_urls,
-                       urls_vector, rank, users_query, emmised_queries, query_id, users)
+                        if (len(clicked_urls[user_id].intersection(set(u[0] for u in user_clicks))) == 0):
+                            features = get_local_features(user_clicks, user_id, clicked_urls,
+                       rank, users_query, emmised_queries, query_id,  users)
 
 
                         if (day >= n_training_days and len(features) > 0):
@@ -165,12 +177,12 @@ def main1():
     #users_vector_as_queries = users_as_sum_queries(data_file, query_vector, users_name)
     #query_vector.clear()
 
-    urls_vector = get_features(urls_name, dim)
-    users_vector_as_urls = users_as_sum_urls(data_file, urls_vector, users_name)
+    #urls_vector = get_features(urls_name, dim)
+    #users_vector_as_urls = users_as_sum_urls(data_file, urls_vector, users_name)
 
     users_query = users_that_entered_query(data_file, queries_name)
     emmised_queries = query_emmissed_by_user(data_file, users_name)
-
+    clicked_urls = cliked_document_by_user(data_file, users_name)
     #users_norm = {}
     #i  = 0
     #for key in users_vector_as_queries.keys():
@@ -179,8 +191,8 @@ def main1():
     #    i += 1
     #    users_norm[key] = np.inner(users_vector_as_queries[key], users_vector_as_queries[key])
 
-    get_data(data_file, train_f, test_f, users_vector_as_urls,
-                 urls_vector, users_query, emmised_queries)
+    get_data(data_file, train_f, test_f, clicked_urls,
+                 users_query, emmised_queries)
 
 def get_queries():
     res = []
@@ -188,12 +200,12 @@ def get_queries():
         for line in q:
             res.append(int(line.strip()))
     res = set(res)
-    with open("../../big_data/trainW2V_small") as t, open("../../big_data/trainW2V_small_q", 'w') as r:
+    with open("../../big_data/trainW2V") as t, open("../../big_data/trainW2V_small_q", 'w') as r:
         for line in t:
             line1 = line.strip().split("\t")
             if (int(line1[2]) in res):
                 r.write(line)
-main1()
+#main1()
 
 
 

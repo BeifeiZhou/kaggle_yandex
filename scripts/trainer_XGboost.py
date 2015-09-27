@@ -33,6 +33,20 @@ def Train(train, validation):
 
     return gbm
 
+
+def Best_permutation(x,y):
+    for i in range(len(x)):
+        if (x[i] > y[i]):
+            return 1
+        if (x[i] < y[i]):
+            return -1
+    return 0
+
+def Get_prediction_permutation(prediction, labels):
+    pr = [[max(float(prediction[i]),0), i] for i in range(len(prediction))]
+    pr.sort(key=lambda x: [-x[0],x[1]])
+    return [labels[pr[i][1]] for i in range(len(pr))]
+
 def run_test(test_file, gbm):
         session = []
         labels = []
@@ -46,53 +60,21 @@ def run_test(test_file, gbm):
             for line_n,line in enumerate(test):
                 if (line_n%10**4 == 0):
                     print(line_n)
+                if (line_n > 1*10**6):
+                    break
                 line = line.strip().split('\t')
-                #if len(line[0].split('_')) > 1:
                 if (len(session)%10 == 0):
                     if (len(session) > 0):
                         session = np.array(session)
-                        #truth = np.array(labels)
-                        #predictions = gbm.predict(session)
-                        predictions= [0 for i in range(10)]
+                        predictions = session[0][0:10]
+                        answer = Best_permutation(Get_prediction_permutation(predictions, labels), labels)
+                        if (answer > 0 and max(predictions) > 5):
+                            n_right_actually_prediction += 1
+                        if (answer < 0 and max(predictions) > 5):
+                            n_predictions += 1
+                            res.write("\t".join(str(s) for s in list(predictions)) + "\n")
+                            res.write("\t".join(str(l) for l in labels) + "\n\n")
 
-                        max_counter = max(session[0][0:10])
-                        counters = [session[0][i]/(i+1.) for i in range(10)]
-                        counters.sort(key=lambda x: -x)
-                        max_counter = counters[0]
-
-                        if (counters[0]/counters[1]) > 1.5 and (counters[0] > 5) \
-                           and session[0][0] < 15 :
-                            s = 0
-                            while(max(predictions) < 1 and s < 10):
-                                if (session[0][s] / (s+1.) >= max_counter):
-                                    predictions[s] = 1
-                                s += 1
-
-
-
-
-                        if (max(predictions) > 0 and predictions[0] == 0):
-
-                            p = [i for i in range(len(predictions)) if predictions[i] > 0]
-                            if (labels[p[0]] == max(labels)):
-                                if (labels[0] != max(labels)):
-                                    n_right_actually_prediction += 1
-                            elif (labels[0] == max(labels)):
-                                res.write("\t".join(str(i) for i in session[0][0:10]) + "\t" + str(line_n) + "\n")
-                                res.write("\t".join(str(i) for i in labels)+ "\t" + str(line_n) + "\n\n")
-                                n_predictions += 1
-
-
-                        results = []
-                        for i in range(len(labels)):
-                            results.append([rangs[i], predictions[i], labels[i]])
-                        results.sort(key=lambda x:-x[1])
-                        urls_with_max_score = [r for r in results if abs(r[1] - results[0][1]) < 1e-10]
-                        urls_with_max_score.sort(key = lambda x:x[0])
-                        max_truth = max(r[2] for r in results)
-                        if (int(max_truth) == int(urls_with_max_score[0][2])):
-                            correct_answer += 1
-                        n_answers += 1
                     session = []
                     labels = []
                     rangs = []
@@ -105,8 +87,11 @@ def run_test(test_file, gbm):
                             break
                 else:
                     try:
+                        label = float(line[-1])
+                        if (label < 0):
+                            label = -1
                         session.append([float(i) for i in line[:-1]])
-                        labels.append(float(line[-1]))
+                        labels.append(label)
                         rangs.append(int(line[-2]))
                     except:
                         break

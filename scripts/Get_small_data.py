@@ -54,7 +54,7 @@ def main():
     data_file = "../../big_data/trainW2V"
     urls_name, queries_name, users_name = Get_small_data(data_file)
     q_names_small = set([q for q in queries_name if random.randint(0,50) == 0])
-    u_names_small = set([u for u in users_name if random.randint(0,50) == 0])
+    u_names_small = set([u for u in users_name if random.randint(0,20) == 0])
     Get_new_data(data_file,"../../big_data/trainW2V_small", u_names_small)
 
 main()
